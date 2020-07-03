@@ -11,7 +11,19 @@ const books = [
     pages: 900,
     price: 1000,
     publicationHouse: 'Mehul Learners Pvt Ltd',
-    ratings: 4
+    ratings: 4,
+    reviews: [
+      {
+        id: 1,
+        description: 'This has been the best book evert written',
+        name: 'Guido van rossum'
+      },
+      {
+        id: 2,
+        description: 'This is python at its best',
+        name: 'Mehul Chopra'
+      }
+    ]
   },
   {
     id: 2,
@@ -19,7 +31,14 @@ const books = [
     pages: 250,
     price: 600,
     publicationHouse: 'Martin Ordesky LLP',
-    ratings: 5
+    ratings: 5,
+    reviews: [
+      {
+        id: 3,
+        description: 'Superb book on how to achieve functional programming using Scala',
+        name: 'James Gosling'
+      }
+    ]
   },
   {
     id: 3,
@@ -71,7 +90,9 @@ app.post('/books', (req, res) => {
   books.push(bookToPush);
   i += 1;
 
-  res.send(bookToPush);
+  res.status(201).send({
+    book: bookToPush
+  });
 });
 
 app.get('/books/:id', (req, res) => {
@@ -82,7 +103,15 @@ app.get('/books/:id', (req, res) => {
     });
 
     if (foundBooks.length > 0) {
-      res.send({ books: foundBooks[0] });
+      const bookToSend = { ...foundBooks[0] };
+      const reviews = bookToSend.reviews;
+      delete bookToSend.reviews;
+
+      if (reviews) {
+        bookToSend.reviews = reviews.map(review => review.id);
+      }
+
+      res.send({ books: bookToSend, reviews, });
     } else {
       res.status(404).send('Not found');
     }
